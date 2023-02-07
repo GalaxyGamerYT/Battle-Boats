@@ -1,29 +1,43 @@
-from random import randint
+import os, csv
 
-def linear(arr: list, x) -> int:
-    for index,i in enumerate(arr):
-        if i == x:
-            return index
-    return -1
+def folderCheck(path: str) -> list:
+    """Checks for a folder and returns the content of the folder."""
+    if not os.path.exists(path):
+        os.mkdir(path)
+    content = os.listdir(path)
+    return content
 
-gArray = [
-    [(1,1),(2,1),(3,1),(4,1),(5,1),(6,1),(7,1),(8,1)],
-    [(1,2),(2,2),(3,2),(4,2),(5,2),(6,2),(7,2),(8,2)],
-    [(1,3),(2,3),(3,3),(4,3),(5,3),(6,3),(7,3),(8,3)],
-    [(1,4),(2,4),(3,4),(4,4),(5,4),(6,4),(7,4),(8,4)],
-    [(1,5),(2,5),(3,5),(4,5),(5,5),(6,5),(7,5),(8,5)],
-    [(1,6),(2,6),(3,6),(4,6),(5,6),(6,6),(7,6),(8,6)],
-    [(1,7),(2,7),(3,7),(4,7),(5,7),(6,7),(7,7),(8,7)],
-    [(1,8),(2,8),(3,8),(4,8),(5,8),(6,8),(7,8),(8,8)]
-]
+def saveGame(ships: list, board: list, name: str):
+    folderCheck(os.path.join("saves",name))
+    
+    # File paths
+    playerShipsPath = os.path.join("saves",name,"playerShips.csv")
+    enemyShipsPath = os.path.join("saves",name,"enemyShips.csv")
+    boardPath = os.path.join("saves",name,"board.csv")
+    
+    # Player Ships file
+    with open(playerShipsPath,"w",newline='') as f:
+        csvwriter = csv.writer(f)
+        for ship in ships[0]:
+            csvwriter.writerow(ship)
+    f.close()
+    
+    # Enemy Ships file
+    with open(enemyShipsPath,"w",newline='') as f:
+        csvwriter = csv.writer(f)
+        for ship in ships[1]:
+            csvwriter.writerow(ship)
+    f.close()
+    
+    # Board file
+    with open(boardPath,"w",newline='') as f:
+        csvwriter = csv.writer(f)
+        for row in board:
+            csvwriter.writerow(row)
+    f.close()
 
-ships = [[],[]]
+a = [[(1,1),(2,2)],[(3,3),(4,4)]]
+b = [["",""],["S","H"],["",""],["M","S"],["H","M"],["",""],["","H"],["S","M"]]
+name = "Save2"
 
-shipAmount = 5
-
-for ship in range(shipAmount-1):
-    pos = (randint(1,8),randint(1,8))
-    if linear(ships[0], pos) == -1:
-        ships[0].append(pos)
-
-print(ships)
+saveGame(a,b,name)
