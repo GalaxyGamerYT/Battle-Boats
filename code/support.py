@@ -91,7 +91,7 @@ def generatePlayerCoords() -> list:
                 print(f"{Fore.RED}{posX} Isn't a valid x coordinate.")
     return ships
 
-def saveGame(ships: list, board: list, name: str, guesses: list):
+def saveGame(ships: list, board: list, name: str, guesses: list) -> None:
     """
     Saves the game files.
     @param ships - the ships of the player and enemy ships.

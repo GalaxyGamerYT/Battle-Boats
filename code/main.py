@@ -15,6 +15,7 @@ class Main:
         """
         Initialize the game state.
         """
+        folderCheck(SAVEGAMEPATH)
         self.saves = []
         self.ships = NEWSHIPS
         self.board = NEWBOARD
@@ -103,6 +104,10 @@ class Main:
                 saveGame(self.ships, self.board, self.saveName, self.guesses)
                 print(self.ships)
                 self.run()
+            else:
+                print(f"{Fore.RED}{self.saveName} Is already a saved game.")
+                sleep(.5)
+                break
             sleep(.5)
         sleep(.5)
 
