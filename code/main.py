@@ -20,7 +20,7 @@ class Main:
         self.ships = NEWSHIPS
         self.board = NEWBOARD
         self.saveName = ""
-        self.guesses = []
+        self.guesses = [[],[]]
 
     def menu(self):
         """
@@ -29,10 +29,11 @@ class Main:
         """
         while True:
             self.saves = listdir(SAVEGAMEPATH)
+            print("\033c")
             if self.saves:
                 print("=======MENU=======\nOption 1: Resume Game\nOption 2: New Game\nOption 3: Instructions\nOption 4: Quit\n==================\nChoose an option[1-4]:")
             else:
-                print(f"=======MENU=======\n"+colored("Option 1: Resume Game","grey")+"\nOption 2: New Game\nOption 3: Instructions\nOption 4: Quit\n==================\nChoose an option[1-4]:")
+                print("=======MENU=======\n"+colored("Option 1: Resume Game","grey")+"\nOption 2: New Game\nOption 3: Instructions\nOption 4: Quit\n==================\nChoose an option[1-4]:")
             choice = input()
             try:
                 choice = int(choice)
@@ -68,13 +69,13 @@ class Main:
         """
         run = True
         while run:
+            print("\033c")
             print("====Game=Saves====")
             for files in self.saves:
                 print("-",files)
             print("==================")
             print("Choose a game save to load:")
             self.saveName = input()
-            print(self.saves)
             if linear(self.saves,self.saveName) != -1:
                 run = False
                 data = loadGame(self.saveName)
@@ -95,11 +96,12 @@ class Main:
         """
         run = True
         while run:
+            print("\033c")
             print("Choose the name of the game save:")
             self.saveName = input()
             if linear(self.saves,self.saveName) == -1:
                 run = False
-                self.ships[0] = generatePlayerCoords()
+                self.ships[0] = generatePlayerCoords(self.board[0])
                 self.ships[1] = generateEnemyCoords()
                 saveGame(self.ships, self.board, self.saveName, self.guesses)
                 print(self.ships)
@@ -108,15 +110,14 @@ class Main:
                 print(f"{Fore.RED}{self.saveName} Is already a saved game.")
                 sleep(.5)
                 break
-            sleep(.5)
-        sleep(.5)
 
     def run(self):
         """
         Run the game. This is the main function for the game. It will run until the game is over.
         @param self - the game object itself.
         """
-        self.game = Game(self.ships, self.board, self.guesses)
+        game = Game(self.ships, self.board, self.guesses)
+        game.run()
 
 if __name__ == "__main__":
     """
