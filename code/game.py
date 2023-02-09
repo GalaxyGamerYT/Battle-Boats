@@ -1,27 +1,35 @@
+from time import sleep
+
 from settings import *
 from support import *
 
 class Game:
     """
-    Initialize the game state.
-    @param ships - the number of ships to be placed on the board.
-    @param board - the board size.
-    @param guessess - the number of guesses the player has.
+    The game function of the game. This function has the game.
     """
-    def __init__(self, ships: list, board: list, guesses: list):
+    def __init__(self, ships: list, board: list, guesses: list, name: str):
         """
-        Initialize the game state.
-        @param ships - the number of ships in the game.
-        @param board - the size of the board.
-        @param guessess - the number of guesses the player has.
+        Initialize the player class.
+        @param ships - the ships the player has been given           
+        @param board - the board the player is playing on           
+        @param guesses - the guesses the player has made           
+        @param name - the name of the player           
         """
+        self.name = name
         self.ships = ships
         self.board = board
         self.guesses = guesses
         self.sunkShips = [0,0]
         self.gameOver = False
     
-    def checkSunkShips(self,guess: list, ships: list, sunkShips: int) -> int:
+    def checkSunkShips(self, guess: list, ships: list, sunkShips: int) -> int:
+        """
+        Check if the guess is a hit or miss. If it is a hit, check if the ship has been sunk.
+        @param guess - the guess from the player.
+        @param ships - the list of ships.
+        @param sunkShips - the number of sunk ships.
+        @return The number of sunk ships.
+        """
         for ship in ships:
             search = linear(guess,ship)
             if search != -1:
@@ -32,18 +40,22 @@ class Game:
     
     def generateEnemyGuess(self):
         """
-        Generate a random guess for the enemy. If the guess is already in the list of guesses,
-        generate a new guess.
-        @param self - the object itself, used to access the guesses list.
+        Generate a random guess for the enemy.
+        @returns the guess
         """
         guessed = False
         while not guessed:
             pos = (randint(0,GRIDSIZE-1),randint(0,GRIDSIZE-1))
-            if linear(self.guesses,pos) == -1:
-                self.guesses.append(pos)
+            if linear(self.guesses[1],pos) == -1:
+                self.guesses[1].append(pos)
+                print(f"The enemy has guessed {pos[0]+1},{pos[1]+1}")
                 guessed = True
     
     def generatePlayerGuess(self):
+        """
+        Generate a guess for the player. The player can only guess once.
+        @returns the guess
+        """
         guessed = False
         while not guessed:
             posX = input("X coordinate[1,8]: ")
@@ -66,7 +78,7 @@ class Game:
                             print(pos)
                             if linear(self.guesses[0], pos) == -1:
                                 self.guesses[0].append(pos)
-                                shipsCreated += 1
+                                guessed = True
                             else:
                                 print(f"{Fore.RED}{pos} has already been used.")
                         else:
@@ -75,7 +87,41 @@ class Game:
                     print(f"{Fore.RED}{posX} Isn't a valid x coordinate.")
     
     def run(self):
-        updatePlayerBoard(self.ships[0], self.board[0], self.guesses)
-        self.guesses[1] = self.generateEnemyGuess()
-        self.checkSunkShips()
-        input(Fore.MAGENTA+"Press ENTER to continue...")
+        """
+        Run the game. This is the main function of the game. It will run until the game is over.
+        @param self - the game object itself
+        """
+        clearWindow()
+        print("         ====GAME=BOARD====")
+        updateEnemyBoard(self.ships[1], self.board[1], self.guesses[0])
+        updatePlayerBoard(self.ships[0], self.board[0], self.guesses[1])
+        input(Fore.MAGENTA+"Press ENTER to start...")
+        
+        while not self.gameOver:
+            clearWindow()
+            updateEnemyBoard(self.ships[1], self.board[1], self.guesses[0])
+            self.generatePlayerGuess()
+            clearWindow()
+            updateEnemyBoard(self.ships[1], self.board[1], self.guesses[0])
+            self.checkSunkShips(self.guesses[0],self.ships[1],self.sunkShips[0])
+            saveGame(self.ships,self.board,self.name,self.guesses)
+            self.generateEnemyGuess()
+            sleep(1)
+            clearWindow()
+            updatePlayerBoard(self.ships[0], self.board[0], self.guesses[1])
+            self.checkSunkShips(self.guesses[1],self.ships[0],self.sunkShips[1])
+            saveGame(self.ships,self.board,self.name,self.guesses)
+            sleep(1)
+            clearWindow()
+            print("         ====GAME=BOARD====")
+            updateEnemyBoard(self.ships[1], self.board[1], self.guesses[0])
+            updatePlayerBoard(self.ships[0], self.board[0], self.guesses[1])
+            input(Fore.MAGENTA+"Press ENTER to continue...")
+        
+        if self.sunkShips[0] == 5:
+            print("You Won!")
+        elif self.sunkShips[1] == 5:
+            print("Your Opponent Won!")
+        
+        saveGame(self.ships,self.board,self.name,self.guesses)
+        input(Fore.MAGENTA+"Press ENTER to go back to menu...")

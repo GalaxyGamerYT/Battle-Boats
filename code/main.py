@@ -11,9 +11,12 @@ from game import Game
 init(autoreset=True)
 
 class Main:
+    """
+    The main function of the game. This function will run the game.
+    """
     def __init__(self):
         """
-        Initialize the game state.
+        Initialize the game. Create the save folder and the game objects.
         """
         folderCheck(SAVEGAMEPATH)
         self.saves = []
@@ -24,12 +27,13 @@ class Main:
 
     def menu(self):
         """
-        The menu for the game. It has the options to resume a game, start a new game, view the instructions, and quit.
-        @param self - the game itself
+        The main menu for the game. This is where the user can choose to either start a new game, resume a game, or quit.
+        @param self - the object itself
         """
         while True:
             self.saves = listdir(SAVEGAMEPATH)
-            print("\033c")
+            #print("\033c")
+            clearWindow()
             if self.saves:
                 print("=======MENU=======\nOption 1: Resume Game\nOption 2: New Game\nOption 3: Instructions\nOption 4: Quit\n==================\nChoose an option[1-4]:")
             else:
@@ -64,19 +68,21 @@ class Main:
 
     def resumeGame(self):
         """
-        Prints the saves and prompts the user to choose a save to load. Once the user has chosen a save, the game will resume.
-        @param self - the game object itself
+        Prints the saves to the screen and allows the user to choose one to load.
+        @returns the name of the save to load
         """
         run = True
         while run:
-            print("\033c")
+            #print("\033c")
+            clearWindow()
             print("====Game=Saves====")
             for files in self.saves:
                 print("-",files)
             print("==================")
             print("Choose a game save to load:")
-            self.saveName = input()
-            if linear(self.saves,self.saveName) != -1:
+            name = input()
+            if linear(self.saves,name) != -1:
+                self.saveName = name
                 run = False
                 data = loadGame(self.saveName)
                 self.ships = data[0]
@@ -87,16 +93,22 @@ class Main:
         sleep(.5)
     
     def instructions(self):
-        """Instructions"""
+        """
+        Instructions for the user to use the program.
+        @param self - the object itself, used to access the class's attributes.
+        """
         pass
 
     def newGame(self):
         """
-        New Game.
+        This function is used to create a new game. It will ask the user for a name for the game, and if the name is not already in use, it will create a new game.
+        @param self - the game object itself
+        @returns nothing
         """
         run = True
         while run:
-            print("\033c")
+            #print("\033c")
+            clearWindow()
             print("Choose the name of the game save:")
             self.saveName = input()
             if linear(self.saves,self.saveName) == -1:
@@ -113,10 +125,10 @@ class Main:
 
     def run(self):
         """
-        Run the game. This is the main function for the game. It will run until the game is over.
+        Run the game.
         @param self - the game object itself.
         """
-        game = Game(self.ships, self.board, self.guesses)
+        game = Game(self.ships, self.board, self.guesses,self.saveName)
         game.run()
 
 if __name__ == "__main__":
