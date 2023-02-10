@@ -24,7 +24,8 @@ class Main:
         self.board = NEWBOARD
         self.saveName = ""
         self.guesses = [[],[]]
-
+        self.sunkShips = [0,0]
+    
     def menu(self):
         """
         The main menu for the game. This is where the user can choose to either start a new game, resume a game, or quit.
@@ -34,6 +35,7 @@ class Main:
             self.saves = listdir(SAVEGAMEPATH)
             #print("\033c")
             clearWindow()
+            self.printTitle()
             if self.saves:
                 print("=======MENU=======\nOption 1: Resume Game\nOption 2: New Game\nOption 3: Instructions\nOption 4: Quit\n==================\nChoose an option[1-4]:")
             else:
@@ -43,29 +45,39 @@ class Main:
                 choice = int(choice)
             except:
                 print(f"{Fore.RED}{choice} Is not a valid option")
-                sleep(.5)
+                sleep(1)
             else:
                 if choice == 1:
                     if self.saves:
-                        sleep(.5)
+                        sleep(1)
                         self.resumeGame()
                     else:
                         print("There is no saved game\nStarting new game")
-                        sleep(.5)
+                        sleep(1)
                         self.newGame()
                 elif choice == 2:
-                    sleep(.5)
+                    sleep(1)
                     self.newGame()
                 elif choice == 3:
-                    print("Instructions")
-                    sleep(.5)
+                    self.instructions()
+                    sleep(1)
                 elif choice == 4:
                     print("Quit")
                     exit()
                 else:
                     print(f"{Fore.RED}{choice} Is not a valid option")
-                    sleep(.5)
-
+                    sleep(1)
+    
+    def printTitle(self):
+        """
+        Print the title of the program.
+        """
+        print(f"{Fore.CYAN} ______     ______     ______   ______   __         ______        ______     ______     ______     ______   ______     ")
+        print(f"{Fore.CYAN}/\  == \   /\  __ \   /\__  _\ /\__  _\ /\ \       /\  ___\      /\  == \   /\  __ \   /\  __ \   /\__  _\ /\  ___\    ")
+        print(f"{Fore.CYAN}\ \  __<   \ \  __ \  \/_/\ \/ \/_/\ \/ \ \ \____  \ \  __\      \ \  __<   \ \ \/\ \  \ \  __ \  \/_/\ \/ \ \___  \   ")
+        print(f"{Fore.CYAN} \ \_____\  \ \_\ \_\    \ \_\    \ \_\  \ \_____\  \ \_____\     \ \_____\  \ \_____\  \ \_\ \_\    \ \_\  \/\_____\  ")
+        print(f"{Fore.CYAN}  \/_____/   \/_/\/_/     \/_/     \/_/   \/_____/   \/_____/      \/_____/   \/_____/   \/_/\/_/     \/_/   \/_____/  ")
+    
     def resumeGame(self):
         """
         Prints the saves to the screen and allows the user to choose one to load.
@@ -88,16 +100,29 @@ class Main:
                 self.ships = data[0]
                 self.board = data[1]
                 self.guessess = data[2]
+                self.sunkShips = data[3]
                 self.run()
-            sleep(.5)
-        sleep(.5)
+            sleep(1)
+        sleep(1)
     
     def instructions(self):
         """
-        Instructions for the user to use the program.
-        @param self - the object itself, used to access the class's attributes.
+        Instructions for the game.
+        @param self - the game object itself
         """
-        pass
+        clearWindow()
+        if self.saves:
+            print("You have a choice, you can either make a "+colored("new game","blue",attrs=["bold"])+" or "+colored("resume","blue",attrs=["bold"])+" a game.\n")
+        else:
+            print("You have to make a "+colored("new game","blue",attrs=["bold"])+".\n")
+        print(colored("--New Game--","cyan",attrs=["bold"])+"\n")
+        print(f"{Fore.MAGENTA}1.{Fore.RESET} Set a name for the game.\n{Fore.MAGENTA}2.{Fore.RESET} Set 5 ship coordinates. X=[A-H], Y=[1-8]\n{Fore.MAGENTA}3.{Fore.RESET} Your opponent sets their boats.\n{Fore.MAGENTA}4.{Fore.RESET} Then follow {Fore.CYAN}Main Game{Fore.RESET}.\n")
+        if self.saves:
+            print(colored("---Resume---","cyan",attrs=["bold"])+"\n")
+            print(f"{Fore.MAGENTA}1.{Fore.RESET} Choose the saved game from a list.\n{Fore.MAGENTA}2.{Fore.RESET} Then follow {Fore.CYAN}Main Game{Fore.RESET}.\n")
+        print(colored("-Main--Game-","cyan",attrs=["bold"])+"\n")
+        print(f"{Fore.MAGENTA}1.{Fore.RESET} You select the coordinate that you want to shoot at.\n{Fore.MAGENTA}2.{Fore.RESET} Your opponent chooses their coordinates.\n{Fore.MAGENTA}3.{Fore.RESET} The first to sink all of the oppositions ships win.\n")
+        input("Press ENTER to continue...")
 
     def newGame(self):
         """
@@ -115,12 +140,11 @@ class Main:
                 run = False
                 self.ships[0] = generatePlayerCoords(self.board[0])
                 self.ships[1] = generateEnemyCoords()
-                saveGame(self.ships, self.board, self.saveName, self.guesses)
-                print(self.ships)
+                saveGame(self.ships, self.board, self.saveName, self.guesses, self.sunkShips)
                 self.run()
             else:
                 print(f"{Fore.RED}{self.saveName} Is already a saved game.")
-                sleep(.5)
+                sleep(1)
                 break
 
     def run(self):
@@ -128,7 +152,7 @@ class Main:
         Run the game.
         @param self - the game object itself.
         """
-        game = Game(self.ships, self.board, self.guesses,self.saveName)
+        game = Game(self.ships, self.board, self.guesses,self.saveName,self.sunkShips)
         game.run()
 
 if __name__ == "__main__":

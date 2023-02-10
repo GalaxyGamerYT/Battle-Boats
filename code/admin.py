@@ -28,20 +28,6 @@ def deleteGameFiles():
                     print("Choose a game save to delete:")
                     game = input()
                     if linear(saves,game) != -1:
-                        # File paths
-                        playerShipsPath = os.path.join(SAVEGAMEPATH,game,"playerShips.csv")
-                        enemyShipsPath = os.path.join(SAVEGAMEPATH,game,"enemyShips.csv")
-                        playerBoardPath = os.path.join(SAVEGAMEPATH,game,"playerBoard.csv")
-                        enemyBoardPath = os.path.join(SAVEGAMEPATH,game,"enemyBoard.csv")
-                        playerGuessessPath = os.path.join(SAVEGAMEPATH,game,"playerGuessess.csv")
-                        enemyGuessessPath = os.path.join(SAVEGAMEPATH,game,"enemyGuessess.csv")
-                        
-                        os.remove(playerShipsPath)
-                        os.remove(enemyShipsPath)
-                        os.remove(playerBoardPath)
-                        os.remove(enemyBoardPath)
-                        os.remove(playerGuessessPath)
-                        os.remove(enemyGuessessPath)
                         os.removedirs(os.path.join(SAVEGAMEPATH,game))
                         print(f"{game} has been deleted.")
                         sleep(1)

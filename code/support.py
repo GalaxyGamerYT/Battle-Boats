@@ -11,7 +11,7 @@ def generateEnemyCoords() -> list:
     """
     shipsCreated = 0
     ships = []
-    while shipsCreated <= SHIPAMOUNT:
+    while shipsCreated < SHIPAMOUNT:
         pos = (randint(0,GRIDSIZE-1),randint(0,GRIDSIZE-1))
         if linear(ships, pos) == -1:
             ships.append(pos)
@@ -62,17 +62,17 @@ def generatePlayerCoords(board: list) -> list:
     """
     shipsCreated = 0
     ships = []
-    while shipsCreated <= SHIPAMOUNT:
+    while shipsCreated < SHIPAMOUNT:
         #print("\033c")
         clearWindow()
         updatePlayerBoard(ships,board)
-        posX = input("Input the x coordinate[1-8]: ")
+        posX = input("Input the x coordinate[A-H]: ").upper()
         try:
-            int(posX)
+            xCoordConvert[posX]
         except:
             print(f"{Fore.RED}{posX} Isn't a valid x coordinate.")
         else:
-            posX = int(posX)-1
+            posX = xCoordConvert[posX]
             if posX >=0 and posX <= GRIDSIZE-1:
                 posY = input("Input the y corrdinate[1-8]: ")
                 try:
@@ -95,7 +95,7 @@ def generatePlayerCoords(board: list) -> list:
                 print(f"{Fore.RED}{posX} Isn't a valid x coordinate.")
     return ships
 
-def saveGame(ships: list, board: list, name: str, guesses: list) -> None:
+def saveGame(ships: list, board: list, name: str, guesses: list, sunkShips: list) -> None:
     """
     Save the game to the save game folder.
     @param ships - the player's ships           
@@ -113,6 +113,7 @@ def saveGame(ships: list, board: list, name: str, guesses: list) -> None:
     enemyBoardPath = os.path.join(SAVEGAMEPATH,name,"enemyBoard.csv")
     playerGuessessPath = os.path.join(SAVEGAMEPATH,name,"playerGuessess.csv")
     enemyGuessessPath = os.path.join(SAVEGAMEPATH,name,"enemyGuessess.csv")
+    sunkShipsPath = os.path.join(SAVEGAMEPATH,name,"sunkShips.csv")
     
     # Player Ships File
     with open(playerShipsPath,"w",newline='') as f:
@@ -154,6 +155,14 @@ def saveGame(ships: list, board: list, name: str, guesses: list) -> None:
         csvwriter = csv.writer(f)
         for row in board[1]:
             csvwriter.writerow(row)
+    f.close()
+    
+    # Sunk Ships File
+    with open(sunkShipsPath,"w",newline='') as f:
+        csvwriter = csv.writer(f)
+        for player in sunkShips:
+            csvwriter.writerow(player)
+    f.close()
 
 def loadGame(name: str) -> list:
     """
@@ -164,6 +173,7 @@ def loadGame(name: str) -> list:
     ships = [[],[]]
     board = [[],[]]
     guessess = [[],[]]
+    sunkShips = []
     
     # File paths
     playerShipsPath = os.path.join(SAVEGAMEPATH,name,"playerShips.csv")
@@ -172,6 +182,7 @@ def loadGame(name: str) -> list:
     enemyBoardPath = os.path.join(SAVEGAMEPATH,name,"enemyBoard.csv")
     playerGuessessPath = os.path.join(SAVEGAMEPATH,name,"playerGuessess.csv")
     enemyGuessessPath = os.path.join(SAVEGAMEPATH,name,"enemyGuessess.csv")
+    sunkShipsPath = os.path.join(SAVEGAMEPATH,name,"sunkShips.csv")
     
     # Player Ships File
     with open(playerShipsPath,"r") as f:
@@ -214,9 +225,14 @@ def loadGame(name: str) -> list:
         for row in csvreader:
             board[1].append(row)
     
-    data = [ships, board, guessess]
+    # Sunk Ships File
+    with open(sunkShipsPath,"r") as f:
+        csvreader = csv.reader(f)
+        for player in csvreader:
+            sunkShips.append(player)
+    f.close()
     
-    return data
+    return [ships, board, guessess, sunkShips]
 
 def drawPlayerGrid(board: list) -> None:
     """
@@ -239,7 +255,7 @@ def drawPlayerGrid(board: list) -> None:
     print()
     print(Fore.MAGENTA+"         ---Your Board---")
     print()
-    print("   │ 1 │ 2 │ 3 │ 4 │ 5 │ 6 │ 7 │ 8 │")
+    print("   │ A │ B │ C │ D │ E │ F │ G │ H │")
     print("───┼───┼───┼───┼───┼───┼───┼───┼───┼")
     print(f" 1 │ {board[0][0]} │ {board[1][0]} │ {board[2][0]} │ {board[3][0]} │ {board[4][0]} │ {board[5][0]} │ {board[6][0]} │ {board[7][0]} │")
     print("───┼───┼───┼───┼───┼───┼───┼───┼───┼")
@@ -297,7 +313,7 @@ def drawEnemyGrid(board: list) -> None:
     print()
     print(Fore.CYAN+"         ---Opponents Board---")
     print()
-    print("   │ 1 │ 2 │ 3 │ 4 │ 5 │ 6 │ 7 │ 8 │")
+    print("   │ A │ B │ C │ D │ E │ F │ G │ H │")
     print("───┼───┼───┼───┼───┼───┼───┼───┼───┼")
     print(f" 1 │ {board[0][0]} │ {board[1][0]} │ {board[2][0]} │ {board[3][0]} │ {board[4][0]} │ {board[5][0]} │ {board[6][0]} │ {board[7][0]} │")
     print("───┼───┼───┼───┼───┼───┼───┼───┼───┼")

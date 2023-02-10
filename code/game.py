@@ -7,7 +7,7 @@ class Game:
     """
     The game function of the game. This function has the game.
     """
-    def __init__(self, ships: list, board: list, guesses: list, name: str):
+    def __init__(self, ships: list, board: list, guesses: list, name: str, sunkShips: list):
         """
         Initialize the player class.
         @param ships - the ships the player has been given           
@@ -19,7 +19,7 @@ class Game:
         self.ships = ships
         self.board = board
         self.guesses = guesses
-        self.sunkShips = [0,0]
+        self.sunkShips = sunkShips
         self.gameOver = False
     
     def checkSunkShips(self, guess: list, ships: list, sunkShips: int) -> int:
@@ -58,15 +58,15 @@ class Game:
         """
         guessed = False
         while not guessed:
-            posX = input("X coordinate[1,8]: ")
+            posX = input("Input the X coordinate[A-H]: ").upper()
             try:
-                int(posX)
+                xCoordConvert[posX]
             except:
                 print(f"{Fore.RED}{posX} Isn't a valid x coordinate.")
             else:
-                posX = int(posX)-1
+                posX = xCoordConvert[posX]
                 if posX >=0 and posX <= GRIDSIZE-1:
-                    posY = input("Input the y corrdinate[1-8]: ")
+                    posY = input("Input the y corrdinate[A-H]: ")
                     try:
                         int(posY)
                     except:
@@ -88,7 +88,7 @@ class Game:
     
     def run(self):
         """
-        Run the game. This is the main function of the game. It will run until the game is over.
+        Run the game. This is the main function for the game. It will run until either the player or the enemy has won.
         @param self - the game object itself
         """
         clearWindow()
@@ -97,20 +97,24 @@ class Game:
         updatePlayerBoard(self.ships[0], self.board[0], self.guesses[1])
         input(Fore.MAGENTA+"Press ENTER to start...")
         
-        while not self.gameOver:
+        while self.sunkShips[0] < 5 or self.sunkShips[1] < 5:
             clearWindow()
             updateEnemyBoard(self.ships[1], self.board[1], self.guesses[0])
             self.generatePlayerGuess()
             clearWindow()
             updateEnemyBoard(self.ships[1], self.board[1], self.guesses[0])
             self.checkSunkShips(self.guesses[0],self.ships[1],self.sunkShips[0])
-            saveGame(self.ships,self.board,self.name,self.guesses)
+            saveGame(self.ships,self.board,self.name,self.guesses,self.sunkShips)
+            
+            updatePlayerBoard(self.ships[0], self.board[0], self.guesses[1])
+            sleep(1)
             self.generateEnemyGuess()
             sleep(1)
             clearWindow()
             updatePlayerBoard(self.ships[0], self.board[0], self.guesses[1])
             self.checkSunkShips(self.guesses[1],self.ships[0],self.sunkShips[1])
-            saveGame(self.ships,self.board,self.name,self.guesses)
+            saveGame(self.ships,self.board,self.name,self.guesses,self.sunkShips)
+            
             sleep(1)
             clearWindow()
             print("         ====GAME=BOARD====")
@@ -123,5 +127,6 @@ class Game:
         elif self.sunkShips[1] == 5:
             print("Your Opponent Won!")
         
-        saveGame(self.ships,self.board,self.name,self.guesses)
+        saveGame(self.ships,self.board,self.name,self.guesses,self.sunkShips)
         input(Fore.MAGENTA+"Press ENTER to go back to menu...")
+        os.removedirs(os.path.join(SAVEGAMEPATH,self.name))
